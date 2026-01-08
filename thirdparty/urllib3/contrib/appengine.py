@@ -52,7 +52,7 @@ from ..exceptions import (
     SSLError,
     TimeoutError,
 )
-from ..packages.six.moves.urllib.parse import urljoin
+from six.moves.urllib.parse import urljoin
 from ..request import RequestMethods
 from ..response import HTTPResponse
 from ..util.retry import Retry

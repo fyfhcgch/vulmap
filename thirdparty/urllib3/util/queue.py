@@ -1,7 +1,7 @@
 import collections
 
 from ..packages import six
-from ..packages.six.moves import queue
+from six.moves import queue
 
 if six.PY2:
     # Queue is imported for side effects on MS Windows. See issue #229.

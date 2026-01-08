@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import datetime
 import logging
 import os
+import ipaddress
 import re
 import socket
 import warnings
@@ -10,8 +11,8 @@ from socket import error as SocketError
 from socket import timeout as SocketTimeout
 
 from .packages import six
-from .packages.six.moves.http_client import HTTPConnection as _HTTPConnection
-from .packages.six.moves.http_client import HTTPException  # noqa: F401
+from six.moves.http_client import HTTPConnection as _HTTPConnection
+from six.moves.http_client import HTTPException  # noqa: F401
 from .util.proxy import create_proxy_ssl_context
 
 try:  # Compiled with SSL?
@@ -503,9 +504,70 @@ class HTTPSConnection(HTTPConnection):
         )
 
 
+def _dnsname_match(dn, hostname):
+    """
+    Match a DNS name against a hostname. This is a simplified version of
+    the match_hostname function from ssl_match_hostname.
+    """
+    if dn == hostname:
+        return True
+    if not dn.startswith('*.'):
+        return False
+    # Wildcard DNS name, check if it matches
+    dn = dn[2:]
+    if '.' not in dn:
+        # Wildcard covers all subdomains
+        return hostname.endswith('.' + dn) or hostname == dn
+    else:
+        # Wildcard covers only one level
+        parts = hostname.split('.')
+        if len(parts) < 2:
+            return False
+        return '.'.join(parts[1:]) == dn
+
+
 def _match_hostname(cert, asserted_hostname):
+    """
+    Verify that the certificate matches the host. We use the match_hostname
+    function from ssl_match_hostname. If that library is not available, we
+    use a fallback that checks for IP addresses and common wildcards.
+    """
     try:
         match_hostname(cert, asserted_hostname)
+    except AttributeError:
+        # match_hostname doesn't exist, so we need to do our own checking
+        if not asserted_hostname:
+            return
+        # Check if the certificate matches the hostname
+        dnsnames = cert.get('subjectAltName', [])
+        if not dnsnames:
+            # No subjectAltName, so check the common name
+            for (key, value) in cert.get('subject', []):
+                if key == 'commonName':
+                    dnsnames.append(('DNS', value))
+        # Check for IP addresses
+        try:
+            host_ip = ipaddress.ip_address(six.ensure_text(asserted_hostname))
+            for (key, value) in dnsnames:
+                if key == 'IP Address':
+                    try:
+                        cert_ip = ipaddress.ip_address(six.ensure_text(value))
+                        if cert_ip == host_ip:
+                            return
+                    except ValueError:
+                        pass
+            # No IP address match found
+            raise CertificateError("Hostname %s doesn't match any IP Address in certificate" % asserted_hostname)
+        except ValueError:
+            # Not an IP address, check DNS names
+            pass
+        # Check DNS names
+        for (key, value) in dnsnames:
+            if key == 'DNS':
+                if _dnsname_match(value, asserted_hostname):
+                    return
+        # No match found
+        raise CertificateError("Hostname %s doesn't match any of the subjectAltName or commonName in certificate" % asserted_hostname)
     except CertificateError as e:
         log.warning(
             "Certificate did not match expected hostname: %s. Certificate: %s",

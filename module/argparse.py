@@ -30,17 +30,6 @@ def arg():
     ge.add_argument("--list", dest="list", action='store_false', help="display the list of supported vulnerabilities")
     ge.add_argument("--debug", action='store_false', help="exp echo request and responses, poc echo vuln lists")
     ge.add_argument("--check", metavar='', default='on', help="survival check (on and off), default on")
-    support = parser.add_argument_group("support")
-    support.add_argument(action='store_false', dest="types of vulnerability scanning:\n  "
-                         "all, activemq, flink, shiro, solr, struts2, tomcat, unomi, drupal\n  "
-                         "elasticsearch, fastjson, jenkins, laravel, nexus, weblogic, jboss\n  "
-                         "spring, thinkphp, druid, exchange, nodejs, saltstack, vmware\n  "
-                         "bigip, ofbiz, coremail, ecology, eyou, qianxin, ruijie")
-    example = parser.add_argument_group("examples")
-    example.add_argument(action='store_false',
-                         dest="python3 vulmap.py -u http://example.com\n  "
-                              "python3 vulmap.py -u http://example.com -a struts2\n  "
-                              "python3 vulmap.py -f list.txt -a weblogic -t 20\n  "
-                              "python3 vulmap.py -f list.txt --output-json results.json\n  "
-                              "python3 vulmap.py --fofa \"app=Apache-Shiro\"")
+    support = parser.add_argument_group("support", "types of vulnerability scanning: all, activemq, flink, shiro, solr, struts2, tomcat, unomi, drupal, elasticsearch, fastjson, jenkins, laravel, nexus, weblogic, jboss, spring, thinkphp, druid, exchange, nodejs, saltstack, vmware, bigip, ofbiz, coremail, ecology, eyou, qianxin, ruijie")
+    example = parser.add_argument_group("examples", "python3 vulmap.py -u http://example.com; python3 vulmap.py -u http://example.com -a struts2; python3 vulmap.py -f list.txt -a weblogic -t 20; python3 vulmap.py -f list.txt --output-json results.json; python3 vulmap.py --fofa \"app=Apache-Shiro\"")
     return parser.parse_args()

@@ -34,7 +34,7 @@ from .exceptions import (
     TimeoutError,
 )
 from .packages import six
-from .packages.six.moves import queue
+from six.moves import queue
 from .packages.ssl_match_hostname import CertificateError
 from .request import RequestMethods
 from .response import HTTPResponse
