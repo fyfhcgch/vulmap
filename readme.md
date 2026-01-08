@@ -68,13 +68,7 @@ globals.set_value("ceye_token", "xxxxxxxxxx")
 > Gif: ![https://github.com/zhzyker/vulmap/blob/main/images/vulmap-0.5-demo-gif.gif](https://github.com/zhzyker/vulmap/blob/main/images/vulmap-0.5-demo-gif.gif)
 
 
-## 🙋 Discussion
-* Vulmap Bug 反馈或新功能建议[点我](https://github.com/zhzyker/vulmap/issues)
-* Twitter: https://twitter.com/zhzyker
-* WeChat: ~~扫码入群聊~~，群聊满200了，扫码再加群了    
-<p>
-    <img alt="QR-code" src="https://github.com/zhzyker/zhzyker/blob/main/my-wechat.jpg" width="20%" height="20%" style="max-width:100%;">
-</p>
+
 
 ## 🔧 Options
 ``` 

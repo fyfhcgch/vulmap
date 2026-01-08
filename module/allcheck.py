@@ -22,14 +22,18 @@ def version_check():
         try:
             github_ver_request = requests.get(url=github_ver_url, headers=headers, timeout=timeout)
             version_res = r'blob-code blob-code-inner js-file-line">(.*)</td>'
-            github_ver = re.findall(version_res, github_ver_request.text, re.S | re.M)[0]
-            if version == github_ver:
-                print(now.timed(de=0) + color.yel_info() + color.yellow(" Currently the latest version: " + version))
-            elif version < github_ver:
-                print(now_warn + color.red(" The current version is: " + version + ", Latest version: " + github_ver))
-                print(now_warn + color.red(" Go to github https://github.com/zhzyker/vulmap update"))
+            github_ver_match = re.findall(version_res, github_ver_request.text, re.S | re.M)
+            if github_ver_match:
+                github_ver = github_ver_match[0]
+                if version == github_ver:
+                    print(now.timed(de=0) + color.yel_info() + color.yellow(" Currently the latest version: " + version))
+                elif version < github_ver:
+                    print(now_warn + color.red(" The current version is: " + version + ", Latest version: " + github_ver))
+                    print(now_warn + color.red(" Go to github https://github.com/zhzyker/vulmap update"))
+                else:
+                    print(now_warn + color.red(" Internal beta version: " + version))
             else:
-                print(now_warn + color.red(" Internal beta version: " + version))
+                print(now_warn + color.red(" The current version is: " + version + ", Version check failed"))
         except requests.exceptions.ConnectionError:
             print(now_warn + color.red(" The current version is: " + version + ", Version check failed"))
         except requests.exceptions.Timeout:

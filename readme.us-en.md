@@ -65,7 +65,6 @@ Before using this tool, please read carefully and fully understand the content o
 
 ## 🙋 Discussion
 * Vulmap bug feedback or new feature suggestions[Point Me](https://github.com/zhzyker/vulmap/issues)
-* Telegram: t.me/zhzyker
 
 ## 🔧 Options
 ``` 
