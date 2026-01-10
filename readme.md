@@ -1,225 +1,226 @@
-## 🌟 Vulmap - Web vulnerability scanning and verification tools
-<a href="https://github.com/zhzyker/vulmap"><img alt="Release" src="https://img.shields.io/badge/python-3.8+-blueviolet"></a>
-<a href="https://github.com/zhzyker/vulmap"><img alt="Release" src="https://img.shields.io/badge/Version-vulmap 0.8-yellow"></a>
-<a href="https://github.com/zhzyker/vulmap"><img alt="Release" src="https://img.shields.io/badge/LICENSE-GPL-ff69b4"></a>
-![GitHub Repo stars](https://img.shields.io/github/stars/zhzyker/vulmap?color=gree)
-![GitHub forks](https://img.shields.io/github/forks/zhzyker/vulmap)
+# Vulmap - 优化版
 
- 
-[[Click here for the English Version]](https://github.com/zhzyker/vulmap/blob/main/readme.us-en.md)  
-> Vulmap 是一款 web 漏洞扫描和验证工具, 可对 webapps 进行漏洞扫描, 并且具备漏洞利用功能, 目前支持的 webapps 包括 activemq, flink, shiro, solr, struts2, tomcat, unomi, drupal, elasticsearch, fastjson, jenkins, nexus, weblogic, jboss, spring, thinkphp
+Vulmap 是一款开源的远程漏洞扫描工具，支持多种漏洞类型扫描，包括 Apache-Shiro、Apache-Solr、Spring、Struts2、Tomcat、WebLogic、ThinkPHP、Drupal、ElasticSearch、Fastjson、Jenkins、Laravel、Nexus、JBoss、VMware 等多款中间件的漏洞检测。
 
-> Vulmap 将漏洞扫描与验证（漏洞利用）结合到了一起, 及大程度便于测试人员在发现漏洞后及时进行下一步操作, 工具追求于于高效、便捷  
-高效: 逐步开发中慢慢引入了批量扫描、Fofa、Shodan 批量扫描, 且支持多线程默认开启协程, 以最快的速度扫描大量资产  
-便捷: 发现漏洞即可利用, 大量资产扫描可多格式输出结果
+## 优化特性
 
-> Vulmap 0.8 版本开始支持对 [dismap](https://github.com/zhzyker/dismap) 识别结果文件直接进行漏洞扫描 `-f output.txt`
+此版本在原始项目基础上进行了全面的安全性、性能和架构优化：
 
+### 安全性增强
+- **加密配置管理**: 使用 Fernet 加密算法安全存储敏感信息（API 密钥、认证凭据等）
+- **输入验证**: 提供 URL、主机名、IP 地址等输入验证，防止路径穿越和注入攻击
+- **安全编码实践**: 改进异常处理，避免敏感信息泄露
 
-## 🛒 Installation
-操作系统中必须有 python3, 推荐 python3.8 或者更高版本
+### 性能优化
+- **动态线程池**: 根据系统资源自动调整线程数量，优化资源利用率
+- **智能请求限速**: 实现自适应请求频率控制，避免对目标系统造成过大压力
+- **资源监控**: 实时监控 CPU 和内存使用情况，动态调整扫描策略
+
+### 架构改进
+- **模块化设计**: 采用清晰的模块分离，提高代码可维护性
+- **线程安全**: 全局变量管理采用线程安全机制，确保并发操作安全
+- **类型安全**: 提供类型安全的全局变量访问接口
+
+## 新增模块说明
+
+### common/config_manager.py
+- `SecureConfigManager`: 安全配置管理器，使用加密存储敏感信息
+- `AppConfig`: 应用配置类，提供安全的配置访问接口
+
+### common/validators.py
+- `InputValidator`: 输入验证器，验证URL、主机名、IP等
+- 提供便捷函数进行输入验证和清理
+
+### common/global_store.py (作为 module/globals.py)
+- `ThreadSafeGlobalStore`: 线程安全的全局变量存储
+- `TypedGlobalStore`: 类型安全的全局变量访问
+
+### common/rate_limiter.py
+- `RateLimiter`: 速率限制器，控制请求频率
+- `AdaptiveRateLimiter`: 自适应速率限制器，根据响应情况调整
+- `DelayManager`: 延迟管理器，提供智能延迟
+
+### common/concurrent_manager.py
+- `DynamicThreadPool`: 动态线程池，根据系统资源自动调整
+- `TaskScheduler`: 任务调度器，提供高级调度功能
+
+## 配置加密（重要）
+
+首次使用前，请设置环境变量以启用安全配置管理：
+
 ```bash
-# git 或前往 release 获取原码
+# Linux/macOS
+export VULMAP_CONFIG_PASSWORD="your_secure_password"
+
+# Windows
+set VULMAP_CONFIG_PASSWORD=your_secure_password
+```
+
+然后初始化安全配置（首次使用）：
+```python
+from common.config_manager import initialize_secure_config
+
+# 初始化配置管理器
+config = initialize_secure_config("your_secure_password")
+
+# 设置敏感信息
+config.set('fofa_email', 'your@email.com')
+config.set('fofa_key', 'your_fofa_key')
+config.set('shodan_key', 'your_shodan_key')
+# ... 其他敏感配置
+```
+
+## 支持的漏洞类型
+
+Vulmap 支持检测以下漏洞类型（包括但不限于）：
+
+- Apache ActiveMQ (CVE-2015-5254, CVE-2016-3088)
+- Apache Druid (CVE-2021-25646)
+- Apache Flink (CVE-2020-17518, CVE-2020-17519)
+- Apache OFBiz (CVE-2021-26295, CVE-2021-29200, CVE-2021-30128)
+- Apache Shiro (CVE-2016-4437)
+- Apache Solr (CVE-2017-12629, CVE-2019-0193, CVE-2019-17558等)
+- Apache Struts2 (多种S2漏洞)
+- Apache Tomcat (CVE-2017-12615, CVE-2020-1938)
+- Apache Unomi (CVE-2020-13942)
+- CoreMail 配置信息泄露
+- Drupal 漏洞 (CVE-2018-7600, CVE-2019-6340等)
+- Ecology 工作流服务漏洞
+- Elasticsearch 漏洞 (CVE-2014-3120, CVE-2015-1427)
+- F5 BIG-IP (CVE-2020-5902)
+- Fastjson 漏洞
+- Exchange 漏洞
+- 以及其他多种框架和系统的漏洞
+
+## 安装要求
+
+### 系统要求
+- Python 3.6+
+
+### 依赖包
+- gevent
+- pycryptodome
+- cryptography
+- psutil
+
+## 安装方法
+
+### 方法一：直接运行
+```bash
 git clone https://github.com/zhzyker/vulmap.git
-# 安装所需的 python 依赖
+cd vulmap
 pip3 install -r requirements.txt
-# Linux & MacOS & Windows
-python3 vulmap.py -u http://example.com
+python3 vulmap.py --help
 ```
-配置 Fofa Api && Shodan Api && Ceye  
 
-使用 Fofa or Shodan 需要修改 vulmap.py 中的配置信息：  
-
-* Fofa info: https://fofa.info/user/users/info  
+### 方法二：Docker
 ```bash
-# 把xxxxxxxxxx替换成fofa的邮箱
-globals.set_value("fofa_email", "xxxxxxxxxx")  
-# 把xxxxxxxxxx替换成fofa的key
-globals.set_value("fofa_key", "xxxxxxxxxx")  
+git clone https://github.com/zhzyker/vulmap.git
+cd vulmap
+docker build -t vulmap .
+docker run --rm -it vulmap --help
 ```
-* Shodan key: https://account.shodan.io  
+
+## 使用方法
+
+### 基本用法
 ```bash
-# 把xxxxxxxxxx替换成自己shodan的key
-globals.set_value("shodan_key", "xxxxxxxxxx")  
+# 查看帮助信息
+python3 vulmap.py --help
+
+# 查看支持的漏洞列表
+python3 vulmap.py --list
+
+# 扫描单个URL
+python3 vulmap.py -u "http://example.com"
+
+# 批量扫描文件中的URL
+python3 vulmap.py -f urls.txt
+
+# 指定特定的应用进行扫描
+python3 vulmap.py -u "http://example.com" -a struts2
+
+# 使用FOFA API进行扫描
+python3 vulmap.py --fofa "app=Apache-Shiro" --fofa-size 200
+
+# 使用Shodan API进行扫描
+python3 vulmap.py --shodan "Shiro"
+
+# 自定义线程数
+python3 vulmap.py -f urls.txt -a weblogic -t 20
+
+# 导出结果到JSON文件
+python3 vulmap.py -f urls.txt --output-json results.json
+
+# 使用代理
+python3 vulmap.py -u "http://example.com" --proxy-socks 127.0.0.1:1080
 ```
-* Ceye info: http://ceye.io  
+
+### 参数说明
+
+#### 目标选项
+- `-u, --url`: 指定目标URL (例如: -u "http://example.com")
+- `-f, --file`: 指定目标列表文件 (例如: -f "list.txt")
+- `--fofa`: 调用FOFA API进行扫描 (例如: --fofa "app=Apache-Shiro")
+- `--shodan`: 调用Shodan API进行扫描 (例如: --shodan "Shiro")
+
+#### 模式选项
+- `-a`: 指定Web应用程序类型 (例如: -a "tomcat")，支持多个应用
+
+#### 通用选项
+- `-t, --thread`: 扫描线程数，默认10个线程
+- `--dnslog`: DNSLOG服务器 (hyuga,dnslog,ceye)，默认自动选择
+- `--output-text`: 结果导出到文本文件
+- `--output-json`: 结果导出到JSON文件
+- `--proxy-socks`: SOCKS代理 (例如: --proxy-socks 127.0.0.1:1080)
+- `--proxy-http`: HTTP代理 (例如: --proxy-http 127.0.0.1:8080)
+- `--fofa-size`: FOFA查询目标数量，默认100 (1-10000)
+- `--user-agent`: 自定义用户代理
+- `--delay`: 延迟检查时间，默认0秒
+- `--timeout`: 扫描超时时间，默认10秒
+- `--list`: 显示支持的漏洞列表
+- `--debug`: 开启调试模式
+- `--check`: 存活检查 (on/off)，默认on
+
+## 配置API密钥
+
+为了使用FOFA、Shodan和其他API功能，你需要配置安全的API密钥设置：
+
+1. 设置环境变量：
 ```bash
-# 把xxxxxxxxxx替换为自己的域名
-globals.set_value("ceye_domain","xxxxxxxxxx")  
-# 把xxxxxxxxxx替换自己ceye的token
-globals.set_value("ceye_token", "xxxxxxxxxx")  
+export VULMAP_CONFIG_PASSWORD="your_secure_password"
 ```
 
-## 📑 Licenses
-在原有协议[LICENSE](https://github.com/zhzyker/vulmap/blob/main/LICENSE)中追加以下免责声明。若与原有协议冲突均以免责声明为准。  
+2. 初始化安全配置：
+```python
+from common.config_manager import initialize_secure_config
 
-本工具禁止进行未授权商业用途，禁止二次开发后进行未授权商业用途。  
-
-本工具仅面向合法授权的企业安全建设行为，在使用本工具进行检测时，您应确保该行为符合当地的法律法规，并且已经取得了足够的授权。  
-
-如您在使用本工具的过程中存在任何非法行为，您需自行承担相应后果，我们将不承担任何法律及连带责任。 
-
-在使用本工具前，请您务必审慎阅读、充分理解各条款内容，限制、免责条款或者其他涉及您重大权益的条款可能会以加粗、加下划线等形式提示您重点注意。 除非您已充分阅读、完全理解并接受本协议所有条款，否则，请您不要使用本工具。您的使用行为或者您以其他任何明示或者默示方式表示接受本协议的，即视为您已阅读并同意本协议的约束。  
-
-
-## 📺 Video demo
-> YouTube:  https://www.youtube.com/watch?v=g4czwS1Snc4  
-> Bilibili: https://www.bilibili.com/video/BV1Fy4y1v7rd  
-> Gif: ![https://github.com/zhzyker/vulmap/blob/main/images/vulmap-0.5-demo-gif.gif](https://github.com/zhzyker/vulmap/blob/main/images/vulmap-0.5-demo-gif.gif)
-
-
-
-
-## 🔧 Options
-``` 
-可选参数:
-  -h, --help            显示此帮助消息并退出
-  -u URL, --url URL     目标 URL (e.g. -u "http://example.com")
-  -f FILE, --file FILE  选择一个目标列表文件,每个url必须用行来区分 (e.g. -f "/home/user/list.txt")
-  --fofa keyword        使用 fofa api 批量扫描 (e.g. --fofa "app=Apache-Shiro")
-  --shodan keyword      使用 shodan api 批量扫描 (e.g. --shodan "Shiro")
-  -m MODE, --mode MODE  模式支持"poc"和"exp",可以省略此选项,默认进入"poc"模式
-  -a APP [APP ...]      指定 webapps（e.g. "weblogic"）不指定则自动指纹识别
-  -c CMD, --cmd CMD     自定义远程命令执行执行的命令,默认是echo随机md5
-  -v VULN, --vuln VULN  利用漏洞,需要指定漏洞编号 (e.g. -v "CVE-2019-2729")
-  -t NUM, --thread NUM  扫描线程数量,默认10线程
-  --dnslog server       dnslog 服务器 (hyuga,dnslog,ceye) 默认自动轮询
-  --output-text file    扫描结果输出到 txt 文件 (e.g. "result.txt")
-  --output-json file    扫描结果输出到 json 文件 (e.g. "result.json")
-  --proxy-socks SOCKS   使用 socks 代理 (e.g. --proxy-socks 127.0.0.1:1080)
-  --proxy-http HTTP     使用 http 代理 (e.g. --proxy-http 127.0.0.1:8080)
-  --user-agent UA       允许自定义 User-Agent
-  --fofa-size SIZE      fofa api 调用资产数量，默认100，可用(1-10000)
-  --delay DELAY         延时时间,每隔多久发送一次,默认 0s
-  --timeout TIMEOUT     超时时间,默认 5s
-  --list                显示支持的漏洞列表
-  --debug               exp 模式显示 request 和 responses, poc 模式显示扫描漏洞列表
-  --check               目标存活检测 (on and off), 默认是 on
+config = initialize_secure_config("your_secure_password")
+config.set('fofa_email', 'your@email.com')
+config.set('fofa_key', 'your_fofa_key')
+config.set('shodan_key', 'your_shodan_key')
+# 保存配置
+config.save_config()
 ```
 
-## 🐾 Examples
-```bash
-# 测试所有漏洞 poc 不指定 -a all 将默认开启指纹识别
-python3 vulmap.py -u http://example.com
+## 注意事项
 
-# 检查站点是否存在 struts2 漏洞
-python3 vulmap.py -u http://example.com -a struts2
+⚠️ **免责声明**：
+- 此工具仅供合法授权的企业安全建设活动使用
+- 在使用此工具进行检测时，应确保行为符合当地法律法规并已获得足够授权
+- 使用过程中存在任何非法行为，需自行承担相应后果，开发者不承担任何法律责任
+- 使用前请仔细阅读并理解所有条款
 
-# 对 http://example.com:7001 进行 WebLogic 的 CVE-2019-2729 漏洞利用
-python3 vulmap.py -u http://example.com:7001 -v CVE-2019-2729
-python3 vulmap.py -u http://example.com:7001 -m exp -v CVE-2019-2729
+## 许可证
 
-# 批量扫描 list.txt 中的 url
-python3 vulmap.py -f list.txt
+本项目采用 GNU General Public License v3.0 (GPL-3.0) 许可证。
 
-# 扫描结果导出到 result.json
-python3 vulmap.py -u http://example.com:7001 --output-json result.json
+## 作者
 
-# 调用 fofa api 批量扫描
-python3 vulmap.py --fofa app=Apache-Shiro
-```
+- **作者**: zhzyker
+- **GitHub**: https://github.com/zhzyker/vulmap
+- **问题反馈**: https://github.com/zhzyker/vulmap/issues
 
-## 🍵 Vulnerabilitys List
-<details>
-<summary>支持的漏洞列表 [点击展开] </summary>  
- 
-```
- +-------------------+------------------+-----+-----+-------------------------------------------------------------+
- | Target type       | Vuln Name        | Poc | Exp | Impact Version && Vulnerability description                 |
- +-------------------+------------------+-----+-----+-------------------------------------------------------------+
- | Apache ActiveMQ   | CVE-2015-5254    |  Y  |  N  | < 5.13.0, deserialization remote code execution             |
- | Apache ActiveMQ   | CVE-2016-3088    |  Y  |  Y  | < 5.14.0, http put&move upload webshell                     |
- | Apache Druid      | CVE-2021-25646   |  Y  |  Y  | < 0.20.1, apache druid console remote code execution        |
- | Apache Flink      | CVE-2020-17518   |  Y  |  N  | < 1.11.3 or < 1.12.0, upload path traversal                 |
- | Apache Flink      | CVE-2020-17519   |  Y  |  Y  | 1.5.1 - 1.11.2, 'jobmanager/logs' path traversal            |
- | Apache OFBiz      | CVE-2021-26295   |  Y  |  N  | < 17.12.06, rmi deserializes arbitrary code execution       |
- | Apache OFBiz      | CVE-2021-29200   |  Y  |  N  | < 17.12.07, rmi deserializes arbitrary code execution       |
- | Apache OFBiz      | CVE-2021-30128   |  Y  |  Y  | < 17.12.07, deserialize remote command execution            | 
- | Apache Shiro      | CVE-2016-4437    |  Y  |  Y  | <= 1.2.4, shiro-550, rememberme deserialization rce         |
- | Apache Solr       | CVE-2017-12629   |  Y  |  Y  | < 7.1.0, runexecutablelistener rce & xxe, only rce is here  |
- | Apache Solr       | CVE-2019-0193    |  Y  |  N  | < 8.2.0, dataimporthandler module remote code execution     |
- | Apache Solr       | CVE-2019-17558   |  Y  |  Y  | 5.0.0 - 8.3.1, velocity response writer rce                 |
- | Apache Solr       | time-2021-0318   |  Y  |  Y  | all, apache solr arbitrary file reading                     |
- | Apache Solr       | CVE-2021-27905   |  Y  |  N  | 7.0.0-7.7.3, 8.0.0-8.8.1, replication handler ssrf          |
- | Apache Struts2    | S2-005           |  Y  |  Y  | 2.0.0 - 2.1.8.1, cve-2010-1870 parameters interceptor rce   |
- | Apache Struts2    | S2-008           |  Y  |  Y  | 2.0.0 - 2.3.17, debugging interceptor rce                   |
- | Apache Struts2    | S2-009           |  Y  |  Y  | 2.1.0 - 2.3.1.1, cve-2011-3923 ognl interpreter rce         |
- | Apache Struts2    | S2-013           |  Y  |  Y  | 2.0.0 - 2.3.14.1, cve-2013-1966 ognl interpreter rce        |
- | Apache Struts2    | S2-015           |  Y  |  Y  | 2.0.0 - 2.3.14.2, cve-2013-2134 ognl interpreter rce        |
- | Apache Struts2    | S2-016           |  Y  |  Y  | 2.0.0 - 2.3.15, cve-2013-2251 ognl interpreter rce          |
- | Apache Struts2    | S2-029           |  Y  |  Y  | 2.0.0 - 2.3.24.1, ognl interpreter rce                      |
- | Apache Struts2    | S2-032           |  Y  |  Y  | 2.3.20-28, cve-2016-3081 rce can be performed via method    |
- | Apache Struts2    | S2-045           |  Y  |  Y  | 2.3.5-31, 2.5.0-10, cve-2017-5638 jakarta multipart rce     |
- | Apache Struts2    | S2-046           |  Y  |  Y  | 2.3.5-31, 2.5.0-10, cve-2017-5638 jakarta multipart rce     |
- | Apache Struts2    | S2-048           |  Y  |  Y  | 2.3.x, cve-2017-9791 struts2-struts1-plugin rce             |
- | Apache Struts2    | S2-052           |  Y  |  Y  | 2.1.2 - 2.3.33, 2.5 - 2.5.12 cve-2017-9805 rest plugin rce  |
- | Apache Struts2    | S2-057           |  Y  |  Y  | 2.0.4 - 2.3.34, 2.5.0-2.5.16, cve-2018-11776 namespace rce  |
- | Apache Struts2    | S2-059           |  Y  |  Y  | 2.0.0 - 2.5.20, cve-2019-0230 ognl interpreter rce          |
- | Apache Struts2    | S2-061           |  Y  |  Y  | 2.0.0-2.5.25, cve-2020-17530 ognl interpreter rce           |
- | Apache Struts2    | S2-devMode       |  Y  |  Y  | 2.1.0 - 2.5.1, devmode remote code execution                |
- | Apache Tomcat     | Examples File    |  Y  |  N  | all version, /examples/servlets/servlet                     |
- | Apache Tomcat     | CVE-2017-12615   |  Y  |  Y  | 7.0.0 - 7.0.81, put method any files upload                 |
- | Apache Tomcat     | CVE-2020-1938    |  Y  |  Y  | 6, 7 < 7.0.100, 8 < 8.5.51, 9 < 9.0.31 arbitrary file read  |
- | Apache Unomi      | CVE-2020-13942   |  Y  |  Y  | < 1.5.2, apache unomi remote code execution                 |
- | CoreMail          | time-2021-0414   |  Y  |  N  | Coremail configuration information disclosure vulnerability |
- | Drupal            | CVE-2018-7600    |  Y  |  Y  | 6.x, 7.x, 8.x, drupalgeddon2 remote code execution          |
- | Drupal            | CVE-2018-7602    |  Y  |  Y  | < 7.59, < 8.5.3 (except 8.4.8) drupalgeddon2 rce            |
- | Drupal            | CVE-2019-6340    |  Y  |  Y  | < 8.6.10, drupal core restful remote code execution         |
- | Ecology           | time-2021-0515   |  Y  |  Y  | <= 9.0, e-cology oa workflowservicexml rce                  |
- | Elasticsearch     | CVE-2014-3120    |  Y  |  Y  | < 1.2, elasticsearch remote code execution                  |
- | Elasticsearch     | CVE-2015-1427    |  Y  |  Y  | < 1.3.7, < 1.4.3, elasticsearch remote code execution       |
- | Exchange          | CVE-2021-26855   |  Y  |  N  | 2010 2013 2016 2019, microsoft exchange server ssrf         |
- | Exchange          | CVE-2021-27065   |  Y  |  Y  | 2010 2013 2016 2019, exchange arbitrary file write          |
- | Eyou Email        | CNVD-2021-26422  |  Y  |  Y  | eyou email system has remote command execution              |
- | F5 BIG-IP         | CVE-2020-5902    |  Y  |  Y  | < 11.6.x, f5 big-ip remote code execution                   |
- | F5 BIG-IP         | CVE-2021-22986   |  Y  |  Y  | < 16.0.1, f5 big-ip remote code execution                   |
- | Fastjson          | VER-1224-1       |  Y  |  Y  | <= 1.2.24 fastjson parse object remote code execution       |
- | Fastjson          | VER-1224-2       |  Y  |  Y  | <= 1.2.24 fastjson parse object remote code execution       |
- | Fastjson          | VER-1224-3       |  Y  |  Y  | <= 1.2.24 fastjson parse object remote code execution       |
- | Fastjson          | VER-1247         |  Y  |  Y  | <= 1.2.47 fastjson autotype remote code execution           |
- | Fsatjson          | VER-1262         |  Y  |  Y  | <= 1.2.62 fastjson autotype remote code execution           |
- | Jenkins           | CVE-2017-1000353 |  Y  |  N  | <= 2.56, LTS <= 2.46.1, jenkins-ci remote code execution    |
- | Jenkins           | CVE-2018-1000861 |  Y  |  Y  | <= 2.153, LTS <= 2.138.3, remote code execution             |
- | Laravel           | CVE-2018-15133   |  N  |  Y  | 5.5.x <= 5.5.40, 5.6.x <= 5.6.29, laravel get app_key rce   |
- | Laravel           | CVE-2021-3129    |  Y  |  N  | ignition <= 2.5.1, laravel debug mode remote code execution |
- | Nexus OSS/Pro     | CVE-2019-7238    |  Y  |  Y  | 3.6.2 - 3.14.0, remote code execution vulnerability         |
- | Nexus OSS/Pro     | CVE-2020-10199   |  Y  |  Y  | 3.x <= 3.21.1, remote code execution vulnerability          |
- | Node.JS           | CVE-2021-21315   |  Y  |  N  | systeminformation < 5.3.1, node.js command injection        |
- | Oracle Weblogic   | CVE-2014-4210    |  Y  |  N  | 10.0.2 - 10.3.6, weblogic ssrf vulnerability                |
- | Oracle Weblogic   | CVE-2016-0638    |  Y  |  N  | 10.3.6.0, 12.2.1-3, t3 deserialization rce                  |
- | Oracle Weblogic   | CVE-2017-3506    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.0-2, weblogic wls-wsat rce       |
- | Oracle Weblogic   | CVE-2017-10271   |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.1-2, weblogic wls-wsat rce       |
- | Oracle Weblogic   | CVE-2018-2894    |  Y  |  Y  | 12.1.3.0, 12.2.1.2-3, deserialization any file upload       |
- | Oracle Weblogic   | CVE-2018-3191    |  Y  |  N  | 10.3.6.0, 12.1.3.0, 12.2.1.3, t3 deserialization rce        |
- | Oracle Weblogic   | CVE-2019-2725    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, weblogic wls9-async deserialization rce |
- | Oracle Weblogic   | CVE-2019-2890    |  Y  |  N  | 10.3.6.0, 12.1.3.0, 12.2.1.3, t3 deserialization rce        |
- | Oracle Weblogic   | CVE-2019-2729    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.3 wls9-async deserialization rce |
- | Oracle Weblogic   | CVE-2020-2551    |  Y  |  N  | 10.3.6.0, 12.1.3.0, 12.2.1.3-4, wlscore deserialization rce |
- | Oracle Weblogic   | CVE-2020-2555    |  Y  |  Y  | 3.7.1.17, 12.1.3.0.0, 12.2.1.3-4.0, t3 deserialization rce  |
- | Oracle Weblogic   | CVE-2020-2883    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.3-4, iiop t3 deserialization rce |
- | Oracle Weblogic   | CVE-2020-14882   |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.3-4, 14.1.1.0, console rce       |
- | Oracle Weblogic   | CVE-2020-2109    |  Y  |  Y  | 10.3.6.0, 12.1.3.0, 12.2.1.3-4, 14.1.1.0, unauthorized jndi |
- | QiAnXin           | time-2021-0410   |  Y  |  Y  | qianxin ns-ngfw netkang next generation firewall front rce  |
- | RedHat JBoss      | CVE-2010-0738    |  Y  |  Y  | 4.2.0 - 4.3.0, jmx-console deserialization any files upload |
- | RedHat JBoss      | CVE-2010-1428    |  Y  |  Y  | 4.2.0 - 4.3.0, web-console deserialization any files upload |
- | RedHat JBoss      | CVE-2015-7501    |  Y  |  Y  | 5.x, 6.x, jmxinvokerservlet deserialization any file upload |
- | RuiJie            | time_2021_0424   |  Y  |  N  | get account password, background rce                        |
- | Saltstack         | CVE-2021-25282   |  Y  |  Y  | < 3002.5, saltStack arbitrary file writing vulnerability    |
- | Spring Data       | CVE-2018-1273    |  Y  |  Y  | 1.13 - 1.13.10, 2.0 - 2.0.5, spring data commons rce        |
- | Spring Cloud      | CVE-2019-3799    |  Y  |  Y  | 2.1.0-2.1.1, 2.0.0-2.0.3, 1.4.0-1.4.5, directory traversal  |
- | Spring Cloud      | CVE-2020-5410    |  Y  |  Y  | < 2.2.3, < 2.1.9, directory traversal vulnerability         |
- | ThinkPHP          | CVE-2019-9082    |  Y  |  Y  | < 3.2.4, thinkphp rememberme deserialization rce            |
- | ThinkPHP          | CVE-2018-20062   |  Y  |  Y  | <= 5.0.23, 5.1.31, thinkphp rememberme deserialization rce  |
- | Vmware vCenter    | time-2020-1013   |  Y  |  N  | <= 6.5u1, vmware vcenter arbitrary file reading (not cve)   |
- | Vmware vCenter    | CVE-2021-21972   |  Y  |  Y  | 7.0 < 7.0U1c, 6.7 < 6.7U3l, 6.5 < 6.5U3n, any file upload   |
- | VMware vRealize   | CVE-2021-21975   |  Y  |  N  | <= 8.3.0, vmware vrealize operations manager api ssrf       |
- +-------------------+------------------+-----+-----+-------------------------------------------------------------+
-```
-</details>
+## 贡献
 
-## 🐟 Docker
-
-```shell
-docker build -t vulmap/vulmap .
-docker run --rm -ti vulmap/vulmap  python vulmap.py -u https://www.example.com
-```
+欢迎提交Issue和Pull Request来改进此项目。

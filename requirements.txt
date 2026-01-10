@@ -1,2 +1,4 @@
 gevent>=20.9
 pycryptodome
+cryptography
+psutil
