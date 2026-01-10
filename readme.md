@@ -2,9 +2,7 @@
 
 Vulmap 是一款开源的远程漏洞扫描工具，支持多种漏洞类型扫描，包括 Apache-Shiro、Apache-Solr、Spring、Struts2、Tomcat、WebLogic、ThinkPHP、Drupal、ElasticSearch、Fastjson、Jenkins、Laravel、Nexus、JBoss、VMware 等多款中间件的漏洞检测。
 
-## 优化特性
-
-此版本在原始项目基础上进行了全面的安全性、性能和架构优化：
+## 🚀 主要特性
 
 ### 安全性增强
 - **加密配置管理**: 使用 Fernet 加密算法安全存储敏感信息（API 密钥、认证凭据等）
@@ -21,7 +19,7 @@ Vulmap 是一款开源的远程漏洞扫描工具，支持多种漏洞类型扫�
 - **线程安全**: 全局变量管理采用线程安全机制，确保并发操作安全
 - **类型安全**: 提供类型安全的全局变量访问接口
 
-## 新增模块说明
+## 📦 新增模块说明
 
 ### common/config_manager.py
 - `SecureConfigManager`: 安全配置管理器，使用加密存储敏感信息
@@ -44,7 +42,36 @@ Vulmap 是一款开源的远程漏洞扫描工具，支持多种漏洞类型扫�
 - `DynamicThreadPool`: 动态线程池，根据系统资源自动调整
 - `TaskScheduler`: 任务调度器，提供高级调度功能
 
-## 配置加密（重要）
+## 🔧 快速开始
+
+### 安装要求
+- Python 3.6+
+
+### 依赖包
+- gevent
+- pycryptodome
+- cryptography
+- psutil
+
+### 安装方法
+
+#### 方法一：直接运行
+```bash
+git clone https://github.com/fyfhcgch/vulmap.git
+cd vulmap
+pip3 install -r requirements.txt
+python3 vulmap.py --help
+```
+
+#### 方法二：Docker
+```bash
+git clone https://github.com/fyfhcgch/vulmap.git
+cd vulmap
+docker build -t vulmap .
+docker run --rm -it vulmap --help
+```
+
+## ⚙️ 配置加密（重要）
 
 首次使用前，请设置环境变量以启用安全配置管理：
 
@@ -70,58 +97,7 @@ config.set('shodan_key', 'your_shodan_key')
 # ... 其他敏感配置
 ```
 
-## 支持的漏洞类型
-
-Vulmap 支持检测以下漏洞类型（包括但不限于）：
-
-- Apache ActiveMQ (CVE-2015-5254, CVE-2016-3088)
-- Apache Druid (CVE-2021-25646)
-- Apache Flink (CVE-2020-17518, CVE-2020-17519)
-- Apache OFBiz (CVE-2021-26295, CVE-2021-29200, CVE-2021-30128)
-- Apache Shiro (CVE-2016-4437)
-- Apache Solr (CVE-2017-12629, CVE-2019-0193, CVE-2019-17558等)
-- Apache Struts2 (多种S2漏洞)
-- Apache Tomcat (CVE-2017-12615, CVE-2020-1938)
-- Apache Unomi (CVE-2020-13942)
-- CoreMail 配置信息泄露
-- Drupal 漏洞 (CVE-2018-7600, CVE-2019-6340等)
-- Ecology 工作流服务漏洞
-- Elasticsearch 漏洞 (CVE-2014-3120, CVE-2015-1427)
-- F5 BIG-IP (CVE-2020-5902)
-- Fastjson 漏洞
-- Exchange 漏洞
-- 以及其他多种框架和系统的漏洞
-
-## 安装要求
-
-### 系统要求
-- Python 3.6+
-
-### 依赖包
-- gevent
-- pycryptodome
-- cryptography
-- psutil
-
-## 安装方法
-
-### 方法一：直接运行
-```bash
-git clone https://github.com/zhzyker/vulmap.git
-cd vulmap
-pip3 install -r requirements.txt
-python3 vulmap.py --help
-```
-
-### 方法二：Docker
-```bash
-git clone https://github.com/zhzyker/vulmap.git
-cd vulmap
-docker build -t vulmap .
-docker run --rm -it vulmap --help
-```
-
-## 使用方法
+## 🛠️ 使用方法
 
 ### 基本用法
 ```bash
@@ -182,7 +158,29 @@ python3 vulmap.py -u "http://example.com" --proxy-socks 127.0.0.1:1080
 - `--debug`: 开启调试模式
 - `--check`: 存活检查 (on/off)，默认on
 
-## 配置API密钥
+## 🔍 支持的漏洞类型
+
+Vulmap 支持检测以下漏洞类型（包括但不限于）：
+
+- Apache ActiveMQ (CVE-2015-5254, CVE-2016-3088)
+- Apache Druid (CVE-2021-25646)
+- Apache Flink (CVE-2020-17518, CVE-2020-17519)
+- Apache OFBiz (CVE-2021-26295, CVE-2021-29200, CVE-2021-30128)
+- Apache Shiro (CVE-2016-4437)
+- Apache Solr (CVE-2017-12629, CVE-2019-0193, CVE-2019-17558等)
+- Apache Struts2 (多种S2漏洞)
+- Apache Tomcat (CVE-2017-12615, CVE-2020-1938)
+- Apache Unomi (CVE-2020-13942)
+- CoreMail 配置信息泄露
+- Drupal 漏洞 (CVE-2018-7600, CVE-2019-6340等)
+- Ecology 工作流服务漏洞
+- Elasticsearch 漏洞 (CVE-2014-3120, CVE-2015-1427)
+- F5 BIG-IP (CVE-2020-5902)
+- Fastjson 漏洞
+- Exchange 漏洞
+- 以及其他多种框架和系统的漏洞
+
+## 🔐 配置API密钥
 
 为了使用FOFA、Shodan和其他API功能，你需要配置安全的API密钥设置：
 
@@ -203,7 +201,21 @@ config.set('shodan_key', 'your_shodan_key')
 config.save_config()
 ```
 
-## 注意事项
+## 📊 示例输出
+
+```
+                   __
+                  [  |
+  _   __  __   _   | |  _ .--..--.   ,--.  _ .--.
+ [ \ [  ][  | | |  | | [ `.-. .-. | `'_\ :[ '/'`\ \
+  \ \/ /  | \_/ |, | |  | | | | | | // | |,| \__/ |
+   \__/   '.__.'_/[___][___||__||__]'-;__/| ;.___/
+                                          [__|
+[INFO] Start scanning target: http://example.com
+[INFO] Scanning completed with no vulnerabilities found
+```
+
+## 📝 注意事项
 
 ⚠️ **免责声明**：
 - 此工具仅供合法授权的企业安全建设活动使用
@@ -211,16 +223,24 @@ config.save_config()
 - 使用过程中存在任何非法行为，需自行承担相应后果，开发者不承担任何法律责任
 - 使用前请仔细阅读并理解所有条款
 
-## 许可证
+## 📄 许可证
 
 本项目采用 GNU General Public License v3.0 (GPL-3.0) 许可证。
 
-## 作者
+## 👥 作者
 
-- **作者**: zhzyker
-- **GitHub**: https://github.com/zhzyker/vulmap
-- **问题反馈**: https://github.com/zhzyker/vulmap/issues
+- **原始作者**: zhzyker
+- **优化版本**: fyfhcgch
+- **GitHub**: https://github.com/fyfhcgch/vulmap
+- **问题反馈**: https://github.com/fyfhcgch/vulmap/issues
 
-## 贡献
+## 🤝 贡献
 
 欢迎提交Issue和Pull Request来改进此项目。
+
+## 🎯 优化亮点
+
+- **安全性**: 通过加密配置管理和输入验证显著提升安全性
+- **性能**: 动态线程池和智能限速提高了扫描效率
+- **稳定性**: 线程安全和类型安全增强了程序稳定性
+- **易用性**: 模块化设计便于扩展和维护
